@@ -29,14 +29,16 @@ public class EntityData {
 	private final String uuid;
 	private final String name;
 	private final ConcurrentLinkedDeque<Integer> entId;
+	private final Object type;
 
-    public EntityData(@NotNull JavaPlugin plugin, @NotNull Location location, @NotNull Collection<Player> seeingPlayers, @NotNull String uuid, Object... lines) {
+    public EntityData(@NotNull JavaPlugin plugin, @NotNull Location location, @NotNull Collection<Player> seeingPlayers, @NotNull String uuid, Object type, Object... lines) {
         this.plugin = plugin;
         this.location = location;
         this.seeingPlayers = seeingPlayers;
         this.lines = new AbstractLine[lines.length];
         this.uuid = uuid;
         this.entId = new ConcurrentLinkedDeque<>();
+        this.type = type;
 
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         Location cloned = this.location.clone().subtract(0, 0.28D, 0);
@@ -206,6 +208,10 @@ public class EntityData {
 
 	public String getName() {
 		return name;
+	}
+
+	public Object getType() {
+		return type;
 	}
 
 
