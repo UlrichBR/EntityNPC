@@ -24,6 +24,13 @@ public class Builder {
         return this;
     }
     
+    @NotNull
+    public Builder setType(@NotNull Object type) {
+        Validate.notNull(type, "Line cannot be null");
+        this.type = type;
+        return this;
+    }
+    
 	public Builder addLines(List<EntityLine> lines2) {
 		for(int j=0; j<lines2.size(); j++) {
             @NotNull
