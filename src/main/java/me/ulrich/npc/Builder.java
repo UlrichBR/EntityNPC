@@ -15,6 +15,7 @@ public class Builder {
 	private final ConcurrentLinkedDeque<EntityLine> lines = new ConcurrentLinkedDeque<>();
     private Location location;
 	private String uuid;
+	private Object type;
 	
     @NotNull
     public Builder setLine(@NotNull EntityLine line) {
@@ -55,7 +56,7 @@ public class Builder {
             throw new IllegalArgumentException("No location given or not completed!");
         }
         
-        EntityData hologram = new EntityData(pool.getPlugin(), this.location, new CopyOnWriteArraySet<>(), this.uuid, this.lines.toArray());
+        EntityData hologram = new EntityData(pool.getPlugin(), this.location, new CopyOnWriteArraySet<>(), this.uuid, this.type, this.lines.toArray());
         //hologram.setAnimation(0, Animation.CIRCLE);
         pool.takeCareOf(hologram);
         return hologram;
