@@ -3,7 +3,6 @@ package me.ulrich.npc;
 import me.ulrich.npc.animation.*;
 import me.ulrich.npc.line.AbstractLine;
 import me.ulrich.npc.line.TextLine;
-import me.ulrich.npc.data.EntityEnum;
 import me.ulrich.npc.data.EntityEquipData;
 import me.ulrich.npc.data.EntityLine;
 import me.ulrich.npc.data.EntityPoseData;
@@ -78,7 +77,7 @@ public class EntityData {
         	
         	if(!entity.getVisible() && entity.getEquipData()!=null && entity.getEquipData().getHead()!=null) {
         		
-        		tempLine = new TextLine(0, this.seeingPlayers, plugin, curr_id, (String) entity.getName(), entity.getEquipData(), entity.getPoseData(), entity.getType(), entity.getAge(), entity.getVisible());
+        		tempLine = new TextLine(0, this.seeingPlayers, plugin, curr_id, (String) entity.getName(), entity.getEquipData(), entity.getPoseData(), entity.getType(), entity.getAge(), entity.getVisible(), entity.getEquipable());
                 tempLine.setLocation(cloned.add(0.0, (up*(j)), 0).clone());
                 if(entity.getAnimation()!=null) {
                 	tempLine.setAnimation(entity.getAnimation());
@@ -86,7 +85,7 @@ public class EntityData {
                 
                 this.lines[j] = tempLine;
         	} else {
-        		tempLine = new TextLine(0, this.seeingPlayers, plugin, curr_id, (String) entity.getName(), entity.getEquipData(), entity.getPoseData(), entity.getType(), entity.getAge(), entity.getVisible());
+        		tempLine = new TextLine(0, this.seeingPlayers, plugin, curr_id, (String) entity.getName(), entity.getEquipData(), entity.getPoseData(), entity.getType(), entity.getAge(), entity.getVisible(), entity.getEquipable());
                 tempLine.setLocation(cloned.add(0.0, up, 0).clone());
                 this.lines[j] = tempLine;
         	}
@@ -107,7 +106,7 @@ public class EntityData {
     	this.seeingPlayers.forEach(getLine(0)::respawn);
     }
     
-    public void setType(EntityEnum entityType) {
+    public void setType(Object entityType) {
     	getLine(0).setEntityType(entityType);
     	this.seeingPlayers.forEach(getLine(0)::respawn);
     }
