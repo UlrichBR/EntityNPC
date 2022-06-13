@@ -27,7 +27,6 @@ import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
 import me.ulrich.npc.animation.Animation;
 import me.ulrich.npc.util.VersionUtil;
-import me.ulrich.npc.data.EntityEnum;
 import me.ulrich.npc.data.EntityEquipData;
 import me.ulrich.npc.data.EntityPoseData;
 import me.ulrich.npc.data.StandEnum.AgeType;
@@ -44,12 +43,13 @@ public abstract class AbstractLine<T> {
     private WrappedDataWatcher defaultDataWatcher;
 	private EntityEquipData equipData;
 	private EntityPoseData poseData;
-	private EntityEnum entityType;
+	private Object entityType;
 	private AgeType age;
 	private int entNum;
 	private Boolean visible;
+	private Boolean equipable;
 
-    public AbstractLine(int entNum, @NotNull Collection<Player> seeingPlayers, @NotNull Plugin plugin, int entityID, @NotNull T obj, EntityEquipData equipData, EntityPoseData poseData, EntityEnum entityType, AgeType age, Boolean visible) {
+    public AbstractLine(int entNum, @NotNull Collection<Player> seeingPlayers, @NotNull Plugin plugin, int entityID, @NotNull T obj, EntityEquipData equipData, EntityPoseData poseData, Object entityType, AgeType age, Boolean visible, Boolean equipable) {
         this.plugin = plugin;
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityID = entityID;
@@ -61,6 +61,7 @@ public abstract class AbstractLine<T> {
         this.entNum = entNum;
         this.visible = visible;
         this.entityType = entityType;
+        this.equipable = equipable;
 
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
             defaultDataWatcher = getDefaultWatcher(Bukkit.getWorlds().get(0));
@@ -105,13 +106,16 @@ public abstract class AbstractLine<T> {
     @SuppressWarnings("deprecation")
 	public void show(@NotNull Player player) {
 
-        final PacketContainer itemPacket = protocolManager.createPacket((this.entityType.equals(EntityEnum.player) || this.entityType.equals(EntityEnum.end_crystal) )?PacketType.Play.Server.SPAWN_ENTITY:PacketType.Play.Server.SPAWN_ENTITY);
+        final PacketContainer itemPacket = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 
+        String entity_desc = (String) this.entityType;
+        String[] splited = entity_desc.split(":");
+        
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
         	
             itemPacket.getIntegers().
                     write(0, this.entityID).
-                    write(1, (int) EntityType.valueOf(this.entityType.getCurrent()).getTypeId()).
+                    write(1, (int) EntityType.valueOf((String) splited[0]).getTypeId()).
                     write(2, (int) (this.location.getX() * 32)).
                     write(3, (int) (this.location.getY() * 32)).
                     write(4, (int) (this.location.getZ() * 32));
@@ -122,9 +126,8 @@ public abstract class AbstractLine<T> {
             final int extraData = 1;
             StructureModifier<Integer> itemInts = itemPacket.getIntegers();
             itemInts.write(0, this.entityID);
-           
-          
-            itemInts.write(1, Integer.valueOf(this.entityType.getCurrent()));
+
+            itemInts.write(1, Integer.valueOf((String) splited[1]));
             itemInts.write(2, extraData);
                                     
             StructureModifier<UUID> itemIDs = itemPacket.getUUIDs();
@@ -203,11 +206,11 @@ public abstract class AbstractLine<T> {
 		this.poseData = poseDatas;
 	}
 
-	public EntityEnum getEntityType() {
+	public Object getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(EntityEnum entityType) {
+	public void setEntityType(Object entityType) {
 		this.entityType = entityType;
 	}
 
@@ -226,5 +229,10 @@ public abstract class AbstractLine<T> {
 	public Boolean getVisible() {
 		return visible;
 	}
+
+	public Boolean getEquipable() {
+		return equipable;
+	}
+
 
 }
