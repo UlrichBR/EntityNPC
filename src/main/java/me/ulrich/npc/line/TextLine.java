@@ -47,7 +47,6 @@ public class TextLine extends AbstractLine<String> {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
 
         String entity_desc = (String) this.getEntityType();
-        String[] splited = entity_desc.split(":");
         
         
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
@@ -67,14 +66,14 @@ public class TextLine extends AbstractLine<String> {
             byte byte15list = (byte) (0x08|0x04);
             
             if(this.getAge()!=null) {
-            	if(splited[1].equalsIgnoreCase("armor_stand") && this.getAge().equals(AgeType.BABY)) {
+            	if(entity_desc.equalsIgnoreCase("armor_stand") && this.getAge().equals(AgeType.BABY)) {
                 	byte15list = (byte) (0x08|0x04|0x01);
                 } else {
                 	byte15list = (byte) (0x08|0x04);
                 }
             	
-            	if(!splited[1].equalsIgnoreCase("armor_stand")) {
-                	if(splited[1].equalsIgnoreCase("slime")) {
+            	if(!entity_desc.equalsIgnoreCase("armor_stand")) {
+                	if(entity_desc.equalsIgnoreCase("slime")) {
                     	watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Integer.class)), ( (this.getAge().equals(AgeType.BABY)?1:4) ));
                 	} else {
                     	watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Boolean.class)), ( (this.getAge().equals(AgeType.BABY)?true:false) ));
@@ -105,8 +104,6 @@ public class TextLine extends AbstractLine<String> {
             
             watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, WrappedDataWatcher.Registry.get(Byte.class)), byte15list );
 
-            
-            
 
             if(this.obj!=null && !this.obj.isEmpty()) {
             	
@@ -122,8 +119,6 @@ public class TextLine extends AbstractLine<String> {
             	WrappedDataWatcher.WrappedDataWatcherObject nameVisible = new WrappedDataWatcher.WrappedDataWatcherObject(3, WrappedDataWatcher.Registry.get(Boolean.class));
                 watcher.setObject(nameVisible, true);	
             }
-            
-
             
             if(this.getPoseData()!=null && this.getEquipable()) {
 
@@ -286,12 +281,11 @@ public class TextLine extends AbstractLine<String> {
 		PacketContainer pc = new PacketContainer(PacketType.Play.Server.ENTITY_LOOK);
 		
 		String entity_desc = (String) this.getEntityType();
-        String[] splited = entity_desc.split(":");
 		
-		if(splited[1].equalsIgnoreCase("armor_stand")) {
+		if(entity_desc.equalsIgnoreCase("armor_stand")) {
 			pc.getIntegers().write(0, this.entityID);
-	        pc.getBytes().write(0, (byte)getCompressedAngle((float) this.getPoseData().getDirection())).write(1, (byte) 0);
-	        pc.getBooleans().write(0, true);
+			 pc.getModifier().writeDefaults();
+	        pc.getBytes().write(0, (byte)getCompressedAngle((float) this.getPoseData().getDirection()));
 		} else {
 			pc = new PacketContainer(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
 			pc.getIntegers().write(0, this.entityID);
