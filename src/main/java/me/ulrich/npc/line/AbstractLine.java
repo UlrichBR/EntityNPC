@@ -104,20 +104,19 @@ public abstract class AbstractLine<T> {
 
     @SuppressWarnings("deprecation")
 	public void show(@NotNull Player player) {
- 
-    	
-    	
-        final PacketContainer itemPacket = protocolManager.createPacket((this.entityType.equals(EntityEnum.player) || this.entityType.equals(EntityEnum.end_crystal) )?PacketType.Play.Server.SPAWN_ENTITY:PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+
+        final PacketContainer itemPacket = protocolManager.createPacket((this.entityType.equals(EntityEnum.player) || this.entityType.equals(EntityEnum.end_crystal) )?PacketType.Play.Server.SPAWN_ENTITY:PacketType.Play.Server.SPAWN_ENTITY);
 
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
         	
             itemPacket.getIntegers().
                     write(0, this.entityID).
-                    write(1, (int) EntityType.valueOf(EntityEnum.valueOf("armor_stand").getCurrent()).getTypeId()).
+                    write(1, (int) EntityType.valueOf(this.entityType.getCurrent()).getTypeId()).
                     write(2, (int) (this.location.getX() * 32)).
                     write(3, (int) (this.location.getY() * 32)).
                     write(4, (int) (this.location.getZ() * 32));
             itemPacket.getDataWatcherModifier().write(0, this.defaultDataWatcher);
+            
         }else{
 
             final int extraData = 1;
