@@ -5,15 +5,16 @@ import me.ulrich.npc.data.StandEnum.AgeType;
 
 public class EntityLine {
 
-	private EntityEnum type;
+	private Object type;
 	private String name;
 	private Boolean visible;
 	private EntityEquipData equipData;
 	private EntityPoseData poseData;
 	private AgeType age;
 	private Animation animation;
+	private Boolean equipable;
 	
-	public EntityLine(EntityEnum type, String name,EntityEquipData equipData, EntityPoseData poseData, AgeType age, Animation animation , Boolean visible) {
+	public EntityLine(Object type, String name,EntityEquipData equipData, EntityPoseData poseData, AgeType age, Animation animation , Boolean visible, Boolean equipable) {
 		this.setType(type);
 		this.setName(name);
 		this.setEquipData(equipData);
@@ -21,14 +22,16 @@ public class EntityLine {
 		this.setAge(age);
 		this.setVisible(visible);
 		this.setAnimation(animation);
+		this.setEquipable(equipable);
+		
 		
 	}
 
-	public EntityEnum getType() {
+	public Object getType() {
 		return type;
 	}
 
-	public void setType(EntityEnum type) {
+	public void setType(Object type) {
 		this.type = type;
 	}
 
@@ -79,5 +82,14 @@ public class EntityLine {
 	public void setAnimation(Animation animation) {
 		this.animation = animation;
 	}
+
+	public Boolean getEquipable() {
+		return equipable;
+	}
+
+	public void setEquipable(Boolean equipable) {
+		this.equipable = equipable;
+	}
+
 
 }
