@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +20,6 @@ import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
-import me.ulrich.npc.data.EntityEnum;
 import me.ulrich.npc.data.EntityEquipData;
 import me.ulrich.npc.data.EntityPoseData;
 import me.ulrich.npc.data.MaterialManager;
@@ -32,8 +30,8 @@ import me.ulrich.npc.util.VersionUtil.VersionEnum;
 public class TextLine extends AbstractLine<String> {
 
 
-    public TextLine(int entNum, @NotNull Collection<Player> seeingPlayers, @NotNull Plugin plugin, int curr_id, @NotNull String obj, EntityEquipData equipData, EntityPoseData poseData, EntityEnum entityType, AgeType age, Boolean visible) {
-        super(entNum, seeingPlayers, plugin, curr_id, obj, equipData, poseData, entityType, age, visible);
+    public TextLine(int entNum, @NotNull Collection<Player> seeingPlayers, @NotNull Plugin plugin, int curr_id, @NotNull String obj, EntityEquipData equipData, EntityPoseData poseData, Object entityType, AgeType age, Boolean visible, Boolean equipable) {
+        super(entNum, seeingPlayers, plugin, curr_id, obj, equipData, poseData, entityType, age, visible, equipable);
 
     }
 
@@ -48,6 +46,10 @@ public class TextLine extends AbstractLine<String> {
         packet.getIntegers().write(0, entityID);
         WrappedDataWatcher watcher = new WrappedDataWatcher();
 
+        String entity_desc = (String) this.getEntityType();
+        String[] splited = entity_desc.split(":");
+        
+        
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
             //watcher.setObject(0, (byte) 0x20);
             watcher.setObject(2, (String) this.obj);
@@ -65,27 +67,27 @@ public class TextLine extends AbstractLine<String> {
             byte byte15list = (byte) (0x08|0x04);
             
             if(this.getAge()!=null) {
-            	if(this.getEntityType().equals(EntityEnum.armor_stand) && this.getAge().equals(AgeType.BABY)) {
+            	if(splited[1].equalsIgnoreCase("armor_stand") && this.getAge().equals(AgeType.BABY)) {
                 	byte15list = (byte) (0x08|0x04|0x01);
                 } else {
                 	byte15list = (byte) (0x08|0x04);
                 }
             	
-            	if(!this.getEntityType().equals(EntityEnum.armor_stand)) {
-                	if(this.getEntityType().equals(EntityEnum.slime)) {
+            	if(!splited[1].equalsIgnoreCase("armor_stand")) {
+                	if(splited[1].equalsIgnoreCase("slime")) {
                     	watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Integer.class)), ( (this.getAge().equals(AgeType.BABY)?1:4) ));
                 	} else {
                     	watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Boolean.class)), ( (this.getAge().equals(AgeType.BABY)?true:false) ));
-                    	if(this.getEntityType().equals(EntityEnum.villager)) {
+                    	//if(this.getEntityType().equals(EntityEnum.villager)) {
                         	//watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Integer.class)), 3);
-                    	}
+                    	//}
 
                 	}
                 }
             	
             }
 
-            if(this.getEntityType().equals(EntityEnum.villager)) {
+            //if(this.getEntityType().equals(EntityEnum.villager)) {
             	
             	//watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, WrappedDataWatcher.Registry.get(Integer.class)), 5);
 
@@ -99,7 +101,7 @@ public class TextLine extends AbstractLine<String> {
             		watcher.setObject(dataWatcherObj, villagerData.getHandle());
             	*/
 
-            }
+           // }
             
             watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, WrappedDataWatcher.Registry.get(Byte.class)), byte15list );
 
@@ -123,7 +125,7 @@ public class TextLine extends AbstractLine<String> {
             
 
             
-            if(this.getPoseData()!=null && this.getEntityType().equals(EntityEnum.armor_stand)) {
+            if(this.getPoseData()!=null && this.getEquipable()) {
 
             	if(this.getPoseData().getLeftHand()!=null) {
                     WrappedDataWatcher.WrappedDataWatcherObject leftArmRotation = new WrappedDataWatcher.WrappedDataWatcherObject(18, WrappedDataWatcher.Registry.get(Vector3F.getMinecraftClass()));
@@ -191,6 +193,8 @@ public class TextLine extends AbstractLine<String> {
     		return;
     	}
     	    	
+    	
+    	
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
         packet.getIntegers().write(0, this.entityID);
         
@@ -210,7 +214,7 @@ public class TextLine extends AbstractLine<String> {
         	
             if(this.getEquipData()!=null) {
 
-            	if((this.getEntityType().equals(EntityEnum.armor_stand) || this.getEntityType().equals(EntityEnum.zombie) || this.getEntityType().equals(EntityEnum.giant) || this.getEntityType().equals(EntityEnum.skeleton))) {
+            	if(this.getEquipable()) {
             		
             		if(this.getEquipData().getHead()!=null) {
                     	pairList.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, this.getEquipData().getHead()));
@@ -281,7 +285,10 @@ public class TextLine extends AbstractLine<String> {
 						
 		PacketContainer pc = new PacketContainer(PacketType.Play.Server.ENTITY_LOOK);
 		
-		if(this.getEntityType().equals(EntityEnum.armor_stand)) {
+		String entity_desc = (String) this.getEntityType();
+        String[] splited = entity_desc.split(":");
+		
+		if(splited[1].equalsIgnoreCase("armor_stand")) {
 			pc.getIntegers().write(0, this.entityID);
 	        pc.getBytes().write(0, (byte)getCompressedAngle((float) this.getPoseData().getDirection())).write(1, (byte) 0);
 	        pc.getBooleans().write(0, true);
