@@ -109,13 +109,12 @@ public abstract class AbstractLine<T> {
         final PacketContainer itemPacket = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 
         String entity_desc = (String) this.entityType;
-        String[] splited = entity_desc.split(":");
         
         if(VersionUtil.isCompatible(VersionUtil.VersionEnum.V1_8)) {
         	
             itemPacket.getIntegers().
                     write(0, this.entityID).
-                    write(1, (int) EntityType.valueOf((String) splited[0]).getTypeId()).
+                    write(1, (int) EntityType.valueOf(entity_desc.toUpperCase()).getTypeId()).
                     write(2, (int) (this.location.getX() * 32)).
                     write(3, (int) (this.location.getY() * 32)).
                     write(4, (int) (this.location.getZ() * 32));
@@ -127,8 +126,8 @@ public abstract class AbstractLine<T> {
             StructureModifier<Integer> itemInts = itemPacket.getIntegers();
             itemInts.write(0, this.entityID);
 
-            itemInts.write(1, Integer.valueOf((String) splited[1]));
-            itemInts.write(2, extraData);
+            //itemInts.write(1, Integer.valueOf((String) splited[1]));
+            //itemInts.write(2, extraData);
                                     
             StructureModifier<UUID> itemIDs = itemPacket.getUUIDs();
             itemIDs.write(0, UUID.randomUUID());
@@ -137,6 +136,9 @@ public abstract class AbstractLine<T> {
             itemDoubles.write(0, this.location.getX());
             itemDoubles.write(1, this.location.getY()/*+1.2*/);
             itemDoubles.write(2, this.location.getZ());
+            
+        	itemPacket.getEntityTypeModifier().write(0, EntityType.valueOf((String) entity_desc.toUpperCase()));
+
         }
 
         try {
